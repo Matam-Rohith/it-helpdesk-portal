@@ -1,10 +1,6 @@
 # IT Help Desk Ticketing Portal
 
-A responsive, production-quality IT Help Desk Ticketing Portal built with **React + TypeScript + Vite + Tailwind CSS**.
-
-## Live Demo
-
-Deploy directly to Vercel — no configuration required.
+A responsive, production-quality IT Help Desk Ticketing Portal 
 
 ## Features
 
@@ -36,28 +32,7 @@ Deploy directly to Vercel — no configuration required.
 - Lucide React Icons
 - LocalStorage (no backend)
 
-## Getting Started
 
-```bash
-npm install
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-## Folder Structure
-
-```
-src/
-  components/     # Sidebar, StatCard, Badge, TicketTable, TicketForm
-  context/        # AuthContext, TicketContext
-  data/           # Sample tickets and users
-  pages/          # Login, AdminDashboard, EmployeeDashboard, EngineerDashboard
-  types/          # TypeScript interfaces
 ```
 
 ## Ticket Flow
