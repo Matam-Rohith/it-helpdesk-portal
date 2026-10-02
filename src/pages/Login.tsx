@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Headphones, Eye, EyeOff, AlertCircle, Shield, Users, Wrench } from 'lucide-react';
+import {
+  Headphones,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Shield,
+  Users,
+  Wrench,
+  Lock,
+} from 'lucide-react';
 
 const Login: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
@@ -12,164 +21,187 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   React.useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true });
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.username.trim() || !form.password) return;
+
     setError('');
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    const success = login(form.username.trim(), form.password);
+
+    const success = await login(form.username.trim(), form.password);
     setLoading(false);
+
     if (success) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } else {
-      setError('Invalid username or password. Please try again.');
+      setError('Invalid username or password. Please verify credentials.');
     }
   };
 
+  const setDemoCredentials = (username: string, password: string) => {
+    setForm({ username, password });
+    setError('');
+  };
+
   const demoAccounts = [
-    { role: 'Admin', username: 'admin', password: 'admin123', Icon: Shield, bg: 'bg-violet-50 border-violet-200 hover:bg-violet-100', text: 'text-violet-700' },
-    { role: 'Employee', username: 'employee', password: 'employee123', Icon: Users, bg: 'bg-sky-50 border-sky-200 hover:bg-sky-100', text: 'text-sky-700' },
-    { role: 'Engineer', username: 'engineer', password: 'engineer123', Icon: Wrench, bg: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100', text: 'text-emerald-700' },
+    {
+      role: 'System Administrator',
+      user: 'Alex Johnson',
+      dept: 'IT Infrastructure',
+      username: 'admin',
+      password: 'admin123',
+      icon: Shield,
+      accent: 'border-purple-200 bg-purple-50/60 hover:bg-purple-100/60 text-purple-900',
+    },
+    {
+      role: 'Support Engineer',
+      user: 'David Chen',
+      dept: 'Systems Support',
+      username: 'engineer',
+      password: 'engineer123',
+      icon: Wrench,
+      accent: 'border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-900',
+    },
+    {
+      role: 'Staff Employee',
+      user: 'Sarah Miller',
+      dept: 'Marketing & Brand',
+      username: 'employee',
+      password: 'employee123',
+      icon: Users,
+      accent: 'border-blue-200 bg-blue-50/60 hover:bg-blue-100/60 text-blue-900',
+    },
   ];
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-5/12 xl:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-500/10 -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-indigo-500/10 translate-y-1/2 -translate-x-1/2" />
-        <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px'}} />
-
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <Headphones className="w-5 h-5 text-white" />
+    <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 bg-slate-900 text-slate-100 font-sans">
+      <div className="w-full max-w-md">
+        {/* Header Branding */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 rounded-xl bg-blue-600 mx-auto flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mb-3">
+            <Headphones className="w-6 h-6" />
           </div>
-          <span className="text-white font-semibold text-lg tracking-tight">IT Help Desk</span>
+          <h1 className="text-2xl font-bold text-white tracking-tight">IT Help Desk Portal</h1>
+          <p className="text-xs text-slate-400 mt-1">Enterprise Service Management & Technical Support</p>
         </div>
 
-        <div className="relative z-10">
-          <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-4">
-            Resolve issues<br />
-            <span className="text-blue-400">faster, together.</span>
-          </h2>
-          <p className="text-slate-400 text-base leading-relaxed max-w-xs">
-            A unified portal for employees, engineers, and admins to track and resolve IT tickets in real time.
-          </p>
-          <div className="mt-10 grid grid-cols-3 gap-4">
-            {[
-              { label: 'Avg. Resolution', value: '< 2h' },
-              { label: 'Tickets Resolved', value: '1,200+' },
-              { label: 'Uptime', value: '99.9%' },
-            ].map((s) => (
-              <div key={s.label} className="rounded-xl bg-white/5 border border-white/10 p-4">
-                <p className="text-white font-bold text-xl">{s.value}</p>
-                <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
-              </div>
-            ))}
+        {/* Card */}
+        <div className="bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200/80 p-6 sm:p-8">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-slate-900">Sign in to your account</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Enter your corporate credentials to access support</p>
           </div>
-        </div>
-
-        <div className="relative z-10">
-          <p className="text-slate-500 text-xs">"Your IT backbone, always on."</p>
-        </div>
-      </div>
-
-      {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-gray-50">
-        <div className="w-full max-w-sm">
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Headphones className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-gray-900 font-semibold">IT Help Desk Portal</span>
-          </div>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-          <p className="text-sm text-gray-500 mb-8">Sign in to your account to continue</p>
 
           {error && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-5 text-sm">
+            <div className="mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5 tracking-wide uppercase">Username</label>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Username
+              </label>
               <input
                 type="text"
-                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
-                placeholder="Enter your username"
+                autoComplete="username"
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
+                placeholder="e.g. admin, engineer, employee"
+                className="input-field"
                 required
-                autoComplete="username"
               />
             </div>
+
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5 tracking-wide uppercase">Password</label>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="w-full px-3.5 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-gray-400"
-                  placeholder="Enter your password"
+                  autoComplete="current-password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Enter your password"
+                  className="input-field pr-10"
                   required
-                  autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm shadow-blue-200 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+              className="w-full btn-primary py-2.5 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm mt-2 disabled:opacity-60"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in...
-                </>
-              ) : 'Sign In'}
+              {loading && (
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {loading ? 'Authenticating...' : 'Sign In'}
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">Demo Accounts</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
+          {/* Quick Demo Switcher */}
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Demo Accounts (Click to test)
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">Instant Fill</span>
+            </div>
 
-          <div className="space-y-2">
-            {demoAccounts.map((acc) => (
-              <button
-                key={acc.role}
-                onClick={() => setForm({ username: acc.username, password: acc.password })}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg border text-xs font-medium transition-all ${acc.bg} ${acc.text}`}
-              >
-                <acc.Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="font-semibold">{acc.role}</span>
-                <span className="opacity-60 ml-auto">{acc.username} / {acc.password}</span>
-              </button>
-            ))}
+            <div className="space-y-2">
+              {demoAccounts.map((acc) => (
+                <button
+                  key={acc.role}
+                  type="button"
+                  onClick={() => setDemoCredentials(acc.username, acc.password)}
+                  className={`w-full text-left p-2.5 rounded-xl border text-xs transition-colors flex items-center justify-between ${acc.accent}`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-white rounded-lg shadow-sm">
+                      <acc.icon className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">{acc.role}</p>
+                      <p className="text-[11px] text-slate-500">{acc.user} · {acc.dept}</p>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-400">
+                    {acc.username}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
+        </div>
 
-          <p className="text-center text-xs text-gray-400 mt-8">
-            © {new Date().getFullYear()} IT Help Desk Portal · SR University
+        {/* Security Footer */}
+        <div className="mt-6 text-center text-xs text-slate-500 space-y-1">
+          <p className="flex items-center justify-center gap-1.5">
+            <Lock className="w-3 h-3 text-slate-400" />
+            <span>Secure 256-bit encrypted authentication session</span>
+          </p>
+          <p className="text-[11px] text-slate-600">
+            Internal IT Help Desk System · SR University
           </p>
         </div>
       </div>
