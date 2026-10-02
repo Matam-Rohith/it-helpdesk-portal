@@ -21,7 +21,7 @@ export interface TicketContextType {
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
 
 export const TicketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [stats, setStats] = useState<TicketStats | null>(null);
@@ -29,7 +29,7 @@ export const TicketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [loading, setLoading] = useState(false);
 
   const refreshTickets = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || authLoading) return;
     setLoading(true);
     try {
       const [ticketsData, statsData, engineersData] = await Promise.all([
@@ -41,20 +41,23 @@ export const TicketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setStats(statsData);
       setEngineers(engineersData);
     } catch (err: any) {
+      if (err?.message?.includes('Session expired') || err?.message?.includes('401')) {
+        return;
+      }
       console.error('Error fetching tickets:', err);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !authLoading) {
       refreshTickets();
-    } else {
+    } else if (!isAuthenticated && !authLoading) {
       setTickets([]);
       setStats(null);
     }
-  }, [isAuthenticated, user?.id, refreshTickets]);
+  }, [isAuthenticated, authLoading, user?.id, refreshTickets]);
 
   const addTicket = async (data: { title: string; description: string; category: string; priority: string }): Promise<Ticket | null> => {
     try {

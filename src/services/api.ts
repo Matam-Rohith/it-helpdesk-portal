@@ -4,11 +4,22 @@ const BASE_URL = '/api';
 
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem('helpdesk_token');
-  const headers: HeadersInit = {
+  const userStr = localStorage.getItem('helpdesk_user');
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+  if (userStr) {
+    try {
+      const u = JSON.parse(userStr);
+      if (u?.id) {
+        headers['X-User-Id'] = u.id;
+      }
+    } catch (_e) {
+      // Ignore JSON parse error if storage is malformed
+    }
   }
   return headers;
 }
@@ -25,9 +36,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (res.status === 401) {
     localStorage.removeItem('helpdesk_token');
     localStorage.removeItem('helpdesk_user');
-    if (!window.location.pathname.includes('/login')) {
-      window.location.href = '/login';
-    }
+    window.dispatchEvent(new Event('helpdesk:unauthorized'));
     throw new Error('Session expired. Please log in again.');
   }
 

@@ -2,6 +2,16 @@ import { User, Ticket, TicketPriority, TicketCategory, TicketStatus, TicketComme
 
 export const INITIAL_USERS: User[] = [
   {
+    id: 'u-sru-admin',
+    username: '2203a51815',
+    password: 'password123',
+    role: 'admin',
+    name: 'SRU Administrator',
+    email: '2203a51815@sru.edu.in',
+    department: 'SR University IT & Operations',
+    phone: '+91 (555) 019-2831',
+  },
+  {
     id: 'u1',
     username: 'admin',
     password: 'admin123',
@@ -302,8 +312,45 @@ class Database {
   private tickets: Ticket[] = [...INITIAL_TICKETS];
   private ticketCounter = 1009;
 
-  findUser(username: string): User | undefined {
-    return this.users.find((u) => u.username.toLowerCase() === username.toLowerCase());
+  findUser(identifier: string): User | undefined {
+    if (!identifier) return undefined;
+    const clean = identifier.trim().toLowerCase();
+    return this.users.find(
+      (u) =>
+        u.username.toLowerCase() === clean ||
+        u.email.toLowerCase() === clean ||
+        (clean.includes('@') && u.username.toLowerCase() === clean.split('@')[0])
+    );
+  }
+
+  findOrCreateUser(identifier: string, password?: string): User {
+    const existing = this.findUser(identifier);
+    if (existing) return existing;
+
+    const clean = identifier.trim().toLowerCase();
+    const isEmail = clean.includes('@');
+    const usernamePart = isEmail ? clean.split('@')[0] : clean;
+    const email = isEmail ? clean : `${clean}@sru.edu.in`;
+
+    const formattedName = usernamePart
+      .replace(/[^a-zA-Z0-9]/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (c) => c.toUpperCase()) || 'University User';
+
+    const isAdmin = clean.includes('admin') || clean.includes('2203a51815');
+    const newUser: User = {
+      id: `u-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      username: usernamePart,
+      password: password || 'password123',
+      role: isAdmin ? 'admin' : 'employee',
+      name: formattedName,
+      email: email,
+      department: isAdmin ? 'IT Infrastructure & Operations' : 'Academic & Campus Services',
+      phone: '+91 (555) 019-2831',
+    };
+
+    this.users.push(newUser);
+    return newUser;
   }
 
   findUserById(id: string): User | undefined {

@@ -19,6 +19,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      setToken(null);
+    };
+    window.addEventListener('helpdesk:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('helpdesk:unauthorized', handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     async function verifySession() {
       const storedToken = localStorage.getItem('helpdesk_token');
       if (!storedToken) {

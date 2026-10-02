@@ -39,7 +39,7 @@ const Login: React.FC = () => {
     if (success) {
       navigate('/dashboard', { replace: true });
     } else {
-      setError('Invalid username or password. Please verify credentials.');
+      setError('Invalid credentials. You can sign in with your email (e.g. 2203a51815@sru.edu.in) or username (admin, engineer, employee).');
     }
   };
 
@@ -50,9 +50,18 @@ const Login: React.FC = () => {
 
   const demoAccounts = [
     {
+      role: 'SRU Administrator',
+      user: 'SR University Admin',
+      dept: 'IT Infrastructure & Operations',
+      username: '2203a51815@sru.edu.in',
+      password: 'password123',
+      icon: Shield,
+      accent: 'border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/70 text-indigo-900',
+    },
+    {
       role: 'System Administrator',
       user: 'Alex Johnson',
-      dept: 'IT Infrastructure',
+      dept: 'IT Operations',
       username: 'admin',
       password: 'admin123',
       icon: Shield,
@@ -107,17 +116,20 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                Username
+                Username or Email Address
               </label>
               <input
                 type="text"
                 autoComplete="username"
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
-                placeholder="e.g. admin, engineer, employee"
+                placeholder="e.g. 2203a51815@sru.edu.in, admin, engineer"
                 className="input-field"
                 required
               />
+              <p className="text-[11px] text-slate-400 mt-1">
+                You can sign in with your email or username
+              </p>
             </div>
 
             <div>
